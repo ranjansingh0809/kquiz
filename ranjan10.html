@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KwickQuiz</title>
+    <style>
+        /* General styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #c98787; /* Dark background for unused space */
+            color: #ffffff; /* Light text color for contrast */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Quiz container */
+        .quiz-container {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .app-name {
+            font-family: 'Pacifico', cursive; /* Fancy font */
+            font-size: 36px;
+            color: #333;
+            margin: 0;
+            padding: 10px 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h2 {
+            font-size: 28px;
+            margin: 0;
+            padding: 10px 0;
+            color: #333;
+            background: #f7f7f7;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Question number */
+        .question-number {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        /* Question text */
+        .question {
+            font-size: 26px;
+            margin-bottom: 30px;
+            color: #444;
+        }
+
+        /* Options */
+        .options {
+            margin-bottom: 30px;
+        }
+
+        .options button {
+            display: block;
+            background-color: #e0f7fa; /* Light refreshing color */
+            color: #00796b; /* Darker color for text to contrast with background */
+            border: none;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px auto;
+            width: 80%;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .options button:hover {
+            background-color: #b2ebf2; /* Slightly darker shade for hover */
+            transform: translateY(-2px);
+        }
+
+        .options button:disabled {
+            background-color: #b2dfdb; /* Disabled state color */
+            color: #004d40;
+            cursor: not-allowed;
+        }
+
+        /* Score */
+        .score {
+            font-size: 22px;
+            margin-bottom: 30px;
+            color: cyan;
+            font-weight: bold;
+        }
+
+        /* Footer */
+        .quiz-footer {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+        }
+
+        .next-button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .next-button:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="header">
+            <h1 class="app-name">KwickQuiz</h1>
+            <h2>Quiz Time!</h2>
+        </div>
+        <div id="question-number" class="question-number"></div>
+        <div id="question" class="question"></div>
+        <div id="options" class="options"></div>
+        <div id="score" class="score"></div>
+        <div id="quiz-footer" class="quiz-footer">
+            <button id="next-button" class="next-button">Next</button>
+        </div>
+    </div>
+    <script>
+        const quizData = [
+            {
+                question: "What is the capital of France?",
+                options: ["Berlin", "Madrid", "Paris", "Lisbon"],
+                correct: "Paris"
+            },
+            {
+                question: "Which planet is known as the Red Planet?",
+                options: ["Earth", "Mars", "Jupiter", "Venus"],
+                correct: "Mars"
+            },
+            {
+                question: "What is the largest ocean on Earth?",
+                options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+                correct: "Pacific Ocean"
+            },
+            {
+                question: "What is the capital of India?",
+                options: ["Paris", "New Delhi", "London", "None"],
+                correct: "New Delhi"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const questionNumberElement = document.getElementById('question-number');
+        const scoreElement = document.getElementById('score');
+        const nextButton = document.getElementById('next-button');
+
+        function loadQuestion() {
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionElement.textContent = currentQuestion.question;
+            questionNumberElement.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+
+            optionsElement.innerHTML = '';
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('option');
+                button.addEventListener('click', () => selectOption(button, currentQuestion.correct));
+                optionsElement.appendChild(button);
+            });
+
+            nextButton.style.display = 'none'; // Hide the next button initially
+        }
+
+        function selectOption(selectedOption, correctAnswer) {
+            const allOptions = document.querySelectorAll('.option');
+            allOptions.forEach(option => option.disabled = true);
+
+            if (selectedOption.textContent === correctAnswer) {
+                selectedOption.style.backgroundColor = '#28a745'; // Green for correct answer
+                score++;
+            } else {
+                selectedOption.style.backgroundColor = '#dc3545'; // Red for incorrect answer
+            }
+
+            nextButton.style.display = 'block'; // Show the next button after selection
+        }
+
+        function showScore() {
+            questionElement.textContent = '';
+            optionsElement.innerHTML = '';
+            questionNumberElement.textContent = '';
+            scoreElement.textContent = `Your Score: ${score} / ${quizData.length}`;
+            nextButton.style.display = 'none'; // Hide next button
+
+            // Add a Restart button
+            const restartButton = document.createElement('button');
+            restartButton.textContent = 'Restart Quiz';
+            restartButton.id = 'restart-button';
+            restartButton.addEventListener('click', restartQuiz);
+            const quizFooter = document.getElementById('quiz-footer');
+            if (quizFooter) {
+                quizFooter.appendChild(restartButton);
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            scoreElement.textContent = '';
+            nextButton.style.display = 'block'; // Show next button
+
+            // Remove the restart button
+            const restartButton = document.getElementById('restart-button');
+            if (restartButton) {
+                restartButton.remove();
+            }
+
+            // Reload the first question
+            loadQuestion();
+        }
+
+        nextButton.addEventListener('click', () => {
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showScore();
+            }
+        });
+
+        // Load the first question when the page loads
+        loadQuestion();
+    </script>
+</body>
+</html>
